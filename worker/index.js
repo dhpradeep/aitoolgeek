@@ -411,7 +411,7 @@ function sitemap() {
   return `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls}</urlset>`;
 }
 
-export default {
+const handler = {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const path = url.pathname.replace(/\/+$/, "") || "/";
@@ -442,3 +442,10 @@ export default {
     });
   },
 };
+
+// Service-worker syntax entrypoint (legacy raw-script upload compatible —
+// avoids the Workers multipart/module-upload API which our deploy broker
+// (single JSON HTTP relay, no multipart) cannot perform).
+addEventListener("fetch", (event) => {
+  event.respondWith(handler.fetch(event.request, {}, event));
+});
